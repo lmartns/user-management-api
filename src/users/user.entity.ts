@@ -1,9 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { ulid } from 'ulid';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
   @Column({ length: 100, nullable: false })
   name: string;
@@ -13,4 +14,9 @@ export class User {
 
   @Column({ length: 255, nullable: false })
   password: string;
+
+  @BeforeInsert()
+  generateId() {
+    this.id = ulid();
+  }
 }
