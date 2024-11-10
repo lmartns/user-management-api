@@ -70,13 +70,14 @@ export class UsersService {
     }
   }
 
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: string): Promise<{ message: string }> {
     try {
       const user = await this.usersRepository.findOneBy({ id });
       if (!user) {
         throw new Error(`User ${id} not found`);
       }
       await this.usersRepository.delete(id);
+      return { message: 'User deleted successfully' };
     } catch (error) {
       throw new Error(`Error delete user for ${id}: ${error.message}`);
     }
