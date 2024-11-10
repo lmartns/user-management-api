@@ -35,16 +35,14 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(
-        createUserDto.password,
-        saltRounds,
-      );
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
       const user = this.usersRepository.create({
         ...createUserDto,
         password: hashedPassword,
       });
+
       return this.usersRepository.save(user);
     } catch (error) {
       throw new Error(`User not created, error: ${error.message}`);
@@ -56,6 +54,14 @@ export class UsersService {
       const user = await this.usersRepository.findOneBy({ id });
       if (!user) {
         throw new Error(`User ${id} not found`);
+      }
+
+      if (updateUserDto.password) {
+        const salt = await bcrypt.genSalt();
+        updateUserDto.password = await bcrypt.hash(
+          updateUserDto.password,
+          salt,
+        );
       }
       await this.usersRepository.update(id, updateUserDto);
       return this.usersRepository.findOneBy({ id });
